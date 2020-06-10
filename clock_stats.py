@@ -44,9 +44,9 @@ class ClockStatsMeasurer(DigitalMeasurer):
 
                 # This uses Welford's online algorithm for calculating a variance
                 self.full_period_count += 1
-                delta = current_period - self.running_mean_period
+                delta = float(current_period) - self.running_mean_period
                 self.running_mean_period += delta / self.full_period_count
-                delta2 = current_period - self.running_mean_period
+                delta2 = float(current_period) - self.running_mean_period
                 self.running_m2_period += delta * delta2
             if bitstate:
                 self.edges_rising += 1
@@ -69,15 +69,15 @@ class ClockStatsMeasurer(DigitalMeasurer):
                 #
                 # The period count will be the number of transition of the same type as the first transition minus one (fence post problem)
                 period_count = (self.edges_rising if self.first_transition_type else self.edges_falling) - 1
-                values[FREQUENCY_AVG] = float(period_count) / (self.last_transition_of_first_type_time - self.first_transition_time)
+                values[FREQUENCY_AVG] = float(period_count) / float(self.last_transition_of_first_type_time - self.first_transition_time)
 
         if FREQUENCY_MIN in self.requested_measurements:
             if self.period_max is not None and self.period_max != 0:
-                values[FREQUENCY_MIN] = 1 / self.period_max
+                values[FREQUENCY_MIN] = 1 / float(self.period_max)
 
         if FREQUENCY_MAX in self.requested_measurements:
             if self.period_min is not None and self.period_min != 0:
-                values[FREQUENCY_MAX] = 1 / self.period_min
+                values[FREQUENCY_MAX] = 1 / float(self.period_min)
 
         if PERIOD_STD_DEV in self.requested_measurements:
             if self.full_period_count > 1:
